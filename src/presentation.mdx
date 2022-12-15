@@ -1,0 +1,457 @@
+import { Counter } from "./counter.jsx"
+
+<MDXPTitleLayout />
+
+---
+
+# Before we start
+
+<Grid
+  gridTemplateColumns={["15% auto 10% 5%", "20% auto 10% 10%", "15% auto 10% 5%"]}
+  gridTemplateRows="100%"
+  gridTemplateAreas=". main logos ."
+>
+
+<Step styles={{
+  before: {opacity: 0},
+  after:  {opacity: 1, transition: 'all 0.2s ease-out'}
+}}
+as='Flex' gridArea="main" flexFlow="column nowrap" justifyContent="space-evenly" height="100%"
+sx={{'& p': {textAlign: 'left', m: 0, lineHeight: 'small', minHeight: '5%'}}}
+>
+
+This is meant to be a fun, tongue-in-cheek presentation. So nothing should be taken too seriously
+
+This presentation has two objectives:
+
+1.To showcase and discuss some of the features of MongoDB
+
+2.To bring awareness of how we tend to promote our favorite tools, coding languages,
+styling practices, etc. as the best solution because of our experience and not
+any real data to back it up as "the best".
+
+</Step>
+
+</Grid>
+
+---
+
+<MDXPSideLayout showSlideNum={false} split={3}>
+
+## It is all relative
+
+All data is related, so why call one database relational and another non-relational?
+
+<Step>
+  Can you tell which email is related to which user?
+
+How about now?
+
+</Step>
+
+<Card bg='MDXPGray5' sx={{minHeight: "200px", "pre": {color: "black", fontSize: "1rem", minHeight: 200}}}>
+
+<Step styles={{
+  after: {display: "none"},
+  before: {display: "none"},
+  current: {display: "inherit"}
+}}>
+
+```js
+[
+  {
+    id: 1,
+    name: "Johnny",
+    contacts: [
+      {
+        type: "email",
+        value: "jj@cool.email",
+      },
+      {
+        type: "phone",
+        value: "555-555-5555",
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: "Sally",
+    contacts: [
+      {
+        type: "email",
+        value: "ss@cool.email",
+      },
+      {
+        type: "phone",
+        value: "555-555-5656",
+      },
+    ],
+  },
+]
+```
+
+```
+Table "public.users"
+id | name
+---+------
+1  | Johnny
+2  | Sally
+
+Table "public.contacts"
+id | user_id | type | value
+---+---------+------+------
+1  | 1       | email| jj@cool.email
+2  | 1       | phone| 555-555-5555
+3  | 2       | email| ss@cool.email
+4  | 2       | phone| 555-555-5656
+```
+
+</Step>
+
+</Card>
+</MDXPSideLayout>
+
+---
+
+# It is only natural
+
+<Grid
+  gridTemplateColumns="1fr 1fr"
+  gridGap="10px"
+>
+
+<Card bg='MDXPGray5' sx={{fontSize: "1.5rem", "pre": {color: "black", fontSize: "1rem",}}}>
+
+The document model is a natural fit for JavaScript
+
+
+```
+[
+  {
+    id: 1,
+    name: "Johnny",
+    contacts: [
+      { type: "email", value: "jj@cool.email"},
+      { type: "phone", value: "555-555-5555"},
+    ],
+  },
+  {
+    id: 2,
+    name: "Sally",
+    contacts: [
+      { type: "email", value: "ss@cool.email"},
+      { type: "phone", value: "555-555-5656"},
+    ],
+  },
+]
+```
+</Card>
+
+<Card bg='MDXPGray5' sx={{fontSize: "1.5rem", "pre": {color: "black", fontSize: "1rem",}}}>
+
+The legacy, tabular model is not really a fit for anything but... spreadsheets?
+
+```
+Table "public.users"
+id | name
+---+------
+1  | Johnny
+2  | Sally
+
+Table "public.contacts"
+id | user_id | type | value
+---+---------+------+------
+1  | 1       | email| jj@cool.email
+2  | 1       | phone| 555-555-5555
+3  | 2       | email| ss@cool.email
+4  | 2       | phone| 555-555-5656
+```
+
+</Card>
+
+</Grid>
+
+---
+
+<MDXPSideLayout showSlideNum={false} split={2}>
+
+### The document model
+
+> "Documents map directly to objects in code, so they are much more natural and
+efficient to work with, driving higher development velocity. There is no need to
+decompose data across tables, run expensive JOINs to reassemble objects or
+integrate a separate ORM layer."  
+-- The unprejudiced folks at MongoDB
+
+<Card style={{color: "black"}}>
+
+<Step style={{fontSize: 24}}>
+
+* _An intuitive data model that is fast and easy for developers to work with._ It looks like the code you write!
+* A flexible schema that allows for the data model to evolve as application needs change.
+* The ability to horizontally scale out. You don't need a centralized database server to handle all your data.
+
+</Step>
+
+
+  
+</Card>
+
+</MDXPSideLayout>
+
+---
+
+# It is just a natural query
+
+Why do ORMs generally make an API like this?
+
+```js
+const getUser = await prisma.user.findMany({
+  where: {
+    id: { notIn: [22, 91, 14, 2, 5] },
+  },
+})
+```
+
+Because they know that MQL is just more intuitive than SQL.
+
+---
+
+### SQL vs MQL
+
+<Grid
+  gridTemplateColumns="1fr 1fr"
+  gridGap="10px"
+>
+
+<Card>
+
+<Step>
+
+<Card>
+
+```js
+Select *
+FROM users
+```
+
+</Card>
+
+<Card>
+
+```js
+SELECT *
+FROM users
+WHERE status = "A"
+````
+
+</Card>
+
+<Card>
+
+```js
+SELECT *
+FROM users
+LIMIT 1
+```
+
+</Card>
+
+<Card>
+
+```js
+ALTER TABLE users
+DROP COLUMN join_date
+```
+
+</Card>
+
+</Step>
+
+</Card>
+
+<Card>
+
+<Step>
+
+<Card>
+
+```js
+db.users.find()
+```
+  
+</Card>
+
+
+<Card>
+
+```js
+db.users.find({status: "A"})
+```
+
+</Card>
+
+<Card>
+
+```js
+db.users.findOne()
+// or
+db.users.find().limit(1)
+```
+
+</Card>
+
+<Card>
+
+```js
+db.users.updateMany(
+    { },
+    { $unset: { "join_date": "" } }
+)
+```
+
+</Card>
+
+</Step>
+
+</Card>
+
+</Grid>
+
+---
+
+### But I am an advanced user
+
+Don't worry! We got you covered with the aggregation pipeline.  
+_How do you get the most played song for each album?_
+<Grid
+  gridTemplateColumns="1fr 1fr"
+  gridGap="10px"
+>
+
+<div>
+
+<Card>
+
+```js   
+SELECT name, title, plays
+    FROM songs s1 INNER JOIN albums ON (album_id = albums.id)
+WHERE plays=(SELECT MAX(s2.plays)
+    FROM songs s2
+WHERE s1.album_id = s2.album_id)
+ORDER BY name;
+```
+
+</Card>
+
+</div>
+
+<div>
+
+<Card>
+
+```js
+db.albums.aggregate([
+  { $project:
+    {
+      name: 1,
+      plays: {
+        $filter: {
+          input: "$songs",
+          as: "item",
+          cond: { $eq: ["$$item.plays", { $max: "$songs.plays" }] }
+        }
+      }
+    }
+  }
+]);
+```
+
+</Card>
+
+</div>
+
+</Grid>
+
+---
+
+### Don't believe it just because someone wrote it on the internet?
+
+<Step>
+
+* MongoDB can't do joins!  
+_Not true. Just use the `$lookup` aggregation stage._
+* MongoDB doesn't have transactions!  
+_Oh really! I wonder what `session.withTransaction()` does?_
+* MongoDB is not ACID compliant!  
+_Um, MongoDB has always been ACID compliant at the document level,
+and since MongoDB version 4, MongoDB is fully ACID compliant across the DB._
+* MongoDB is a schemaless database!  
+_Maybe?? You don't need to use schemas, but if you want to lock in a schema you can._
+* There are other databases that are better than MongoDB!  
+_Well, obviously that is wrong. MongoDB is the best database._
+
+
+</Step>
+
+---
+
+### MongoDB is designed to scale
+
+> "Moore's Law's dead... It's completely over"  
+-- Jensen Huang, CEO of NVIDIA
+
+<Step>
+
+* Legacy, tabular databases were created before the internet was a thing. You had
+to install them from a disc. That means that baked into the design is the assumption that it can
+only run on one computer.
+* MongoDB is designed to scale horizontally. You can add more servers to your cluster,
+and MongoDB will automatically distribute the data across them.
+* Storage is cheap, and getting cheaper. CPU's are expensive, and if Moore's Law
+is dead, then CPU's are going to get more expensive.
+
+So what direction is the future going?
+
+</Step>
+
+---
+
+### Full cloud-based developer data platform
+
+MongoDB Atlas let's you:
+<Step>
+
+* Spin up a database cluster in minutes
+* Scale your cluster with a click of a button
+* Monitor you cluster with Perfomance Advisor and optimize your database
+* Connect your data to MongoDB Charts and visualize your data
+* Stand up a GraphQL API with MongoDB App Services
+
+</Step>
+
+---
+
+### MongoDB is the best database
+
+In conclusion, MongoDB is the best database because:
+* Flexible data model
+* Change-friendly design
+* Intuitive query language
+* Designed to scale
+* Full cloud-based developer data platform
+
+---
+
+### Finally, MongoDB is just better for the environment
+
+<Block style={{textAlign: "left"}}>
+
+> "I hear a lot about how crypto is responsible for global warming, but when you
+think about the time complexity of joins, and the billions and billions and billions
+of relational database queries that execute every day and the time complexity of
+those cpus, I'm telling you the relational database is more responsible for 
+global warming than coal."  
+-- Rick Houlihan, team lead of blackbelt team to migrate Amazon away from Oracle
+
+</Block>
